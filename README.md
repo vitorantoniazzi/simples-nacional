@@ -3,8 +3,10 @@
 Cálculo do Simples Nacional a partir das tabelas legais. Sem dependências, tipado, e testado contra a lei em vez de contra si mesmo.
 
 ```bash
-pip install simples-nacional
+pip install simples-nacional-complexo
 ```
+
+O pacote se instala como `simples-nacional-complexo` e se importa como `simples_nacional`. O sufixo existe porque `simplesnacional` no PyPI já pertence a [outro projeto](https://pypi.org/project/simplesnacional/), de propósito diferente — e porque o nome diz a tese: a alíquota do Simples não conta a história toda.
 
 ## Por que existe
 

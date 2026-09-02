@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "simples-nacional"
+name = "simples-nacional-complexo"
 version = "0.1.0"
 description = "Cálculo do Simples Nacional a partir das tabelas legais: alíquota efetiva, Fator R e RBT12 proporcional."
 readme = "README.md"
