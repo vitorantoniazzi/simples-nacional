@@ -17,6 +17,14 @@ atividade, regime e obrigações acessórias são decisões contábeis.
 
 from __future__ import annotations
 
+from .carga import (
+    CPP_ALIQUOTA_FOLHA_PCT,
+    TRIBUTOS_NO_DAS,
+    Efeito,
+    ItemForaDoDAS,
+    PosicaoNaCadeia,
+    carga_fora_do_das,
+)
 from .core import (
     Apuracao,
     aliquota_efetiva,
@@ -25,7 +33,7 @@ from .core import (
     fator_r,
     rbt12_proporcional,
 )
-from .setores import RESSALVAS, Ressalva, ressalvas_de
+from .setores import RESSALVAS, Ressalva, ressalvas_de, setores_registrados
 from .tabelas import (
     FATOR_R_MINIMO,
     LIMITE_SIMPLES,
@@ -35,23 +43,30 @@ from .tabelas import (
     Faixa,
 )
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
+    "CPP_ALIQUOTA_FOLHA_PCT",
     "FATOR_R_MINIMO",
     "LIMITE_SIMPLES",
     "RESSALVAS",
     "SUBLIMITE_ICMS_ISS",
     "TABELAS",
+    "TRIBUTOS_NO_DAS",
     "Anexo",
     "Apuracao",
+    "Efeito",
     "Faixa",
+    "ItemForaDoDAS",
+    "PosicaoNaCadeia",
     "Ressalva",
     "__version__",
     "aliquota_efetiva",
     "anexo_por_fator_r",
+    "carga_fora_do_das",
     "das_devido",
     "fator_r",
     "rbt12_proporcional",
     "ressalvas_de",
+    "setores_registrados",
 ]

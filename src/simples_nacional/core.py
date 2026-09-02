@@ -61,6 +61,20 @@ class Apuracao:
     """RBT12 acima do sublimite: ICMS e ISS são apurados fora do DAS."""
 
     @property
+    def aliquota_arredondada(self) -> Decimal:
+        """A efetiva a duas casas, meio-para-cima, para exibir.
+
+        :attr:`aliquota_efetiva` é exata e pode ter dezenas de casas; use esta
+        quando o destino for um relatório ou uma tela.
+
+        >>> from decimal import Decimal
+        >>> from simples_nacional import Anexo, aliquota_efetiva
+        >>> aliquota_efetiva(Decimal("1200000"), Anexo.II).aliquota_arredondada
+        Decimal('9.33')
+        """
+        return self.aliquota_efetiva.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+    @property
     def aliquota_nominal(self) -> Decimal:
         return self.faixa.aliquota_nominal
 

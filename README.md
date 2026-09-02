@@ -85,6 +85,40 @@ Quem usa a efetiva como carga total conclui que faturar mais barateia o imposto.
 
 `tests/test_aliquota.py` fixa esse degrau como propriedade esperada, para que ninguém o "conserte" achando que é bug.
 
+## A armadilha do Anexo IV
+
+```python
+from simples_nacional import Anexo, aliquota_efetiva, carga_fora_do_das
+
+rbt12 = Decimal("1000000")
+
+aliquota_efetiva(rbt12, Anexo.III).aliquota_arredondada   # Decimal('12.44')
+aliquota_efetiva(rbt12, Anexo.IV).aliquota_arredondada    # Decimal('10.02')  parece melhor
+
+carga_fora_do_das(Anexo.III)   # ()
+carga_fora_do_das(Anexo.IV)    # (ItemForaDoDAS(tributo='CPP', efeito=ACRESCENTA, ...),)
+```
+
+O DAS do Anexo IV não abrange a contribuição patronal: são 20% sobre a folha, mais RAT de 1% a 3%, recolhidos à parte. Comparar anexos pela alíquota efetiva subestima a carga de quem tem folha.
+
+## Segregação de receitas: a direção depende da cadeia
+
+```python
+from simples_nacional import PosicaoNaCadeia, carga_fora_do_das
+
+# cervejaria: é ela quem recolhe o concentrado
+carga_fora_do_das(Anexo.II, receita_monofasica=True, receita_com_icms_st=True,
+                  posicao=PosicaoNaCadeia.PRODUTOR)
+# PIS/COFINS: ACRESCENTA · ICMS-ST: ACRESCENTA
+
+# bar que revende a mesma cerveja: já foi tributada antes
+carga_fora_do_das(Anexo.I, receita_monofasica=True, receita_com_icms_st=True,
+                  posicao=PosicaoNaCadeia.REVENDEDOR)
+# PIS/COFINS: REDUZ · ICMS-ST: REDUZ
+```
+
+Mesmo produto, lados opostos da cadeia, efeitos opostos. Para quem revende, não segregar é pagar a mais — e o indébito é recuperável. É essa a razão de existir a indústria de recuperação de PIS/COFINS monofásico.
+
 ## Sinalizações
 
 `Apuracao` marca as duas fronteiras que mudam o regime, em vez de deixar passar:
