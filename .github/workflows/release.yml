@@ -1,0 +1,51 @@
+name: Release
+
+# Publica no PyPI via Trusted Publishing (OIDC). Não há token guardado no
+# repositório: o PyPI confia nesta workflow, neste repositório, neste ambiente.
+on:
+  release:
+    types: [published]
+
+permissions: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Conferir que a tag bate com a versão do pacote
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          pkg=$(python -c "import re,pathlib;print(re.search(r'^version = \"(.+?)\"', pathlib.Path('pyproject.toml').read_text(), re.M).group(1))")
+          if [ "$tag" != "$pkg" ]; then
+            echo "tag $tag != version $pkg no pyproject.toml" >&2
+            exit 1
+          fi
+          echo "tag e versão coincidem: $pkg"
+
+      - run: pip install build
+      - run: python -m build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write  # exigido pelo OIDC do Trusted Publishing
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
