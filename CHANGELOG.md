@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0
+
+**Carga total, não alíquota.** `comparar_anexos` põe os cinco anexos lado a lado somando o que fica fora do DAS, e `cpp_fora_do_das` quantifica a contribuição patronal do Anexo IV: 20% sobre a folha mais o RAT do grau de risco, ajustado pelo FAP. Para RBT12 de R$ 1 mi, receita de R$ 80 mil e folha de R$ 30 mil, o Anexo IV mostra 10,02% de alíquota contra 12,44% do Anexo III — e carga total de 17,90% contra 12,44%. A comparação por alíquota inverte o resultado.
+
+**Indébito acumulado.** `indebito_por_segregacao` recebe uma lista de competências e devolve, mês a mês, quanto se pagou a mais por não segregar receita monofásica ou com ICMS-ST, separando o que ainda está no prazo do art. 168 do CTN do que já prescreveu. A contagem usa o vencimento do DAS — dia 20 do mês seguinte — como referência do pagamento; quem pagou em atraso tem prazo contado da data efetiva. Pedido administrativo não interrompe o prazo (Súmula 625 do STJ).
+
+**`percentual_segregavel` e `das_com_segregacao`** expõem a matemática da segregação, que antes vivia no servidor MCP. O cálculo pertence à biblioteca; o MCP é interface.
+
 ## 0.3.0
 
 - `REPARTICAO` traz a segunda tabela de cada anexo, a de "Percentual de Repartição dos Tributos", que diz quanto de cada faixa pertence a cada tributo.

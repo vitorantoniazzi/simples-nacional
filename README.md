@@ -86,6 +86,44 @@ Essa última soma é a que sai do DAS quando a receita é monofásica. Sem a rep
 
 Cada parcela é arredondada a centavos, então a soma pode divergir de `das_devido` em alguns centavos. O total a recolher é o de `das_devido`; as parcelas servem para atribuição e relatório.
 
+## Carga total, não alíquota
+
+RBT12 de R$ 1 milhão, receita mensal de R$ 80 mil, folha de R$ 30 mil:
+
+| Anexo | Alíquota do DAS | CPP por fora | Carga total |
+| --- | --- | --- | --- |
+| III | 12,44% | — | **12,44%** |
+| IV | **10,02%** | R$ 6.300 | **17,90%** |
+
+```python
+from simples_nacional import comparar_anexos
+
+for c in comparar_anexos(Decimal("1000000"), Decimal("80000"), folha=Decimal("30000")):
+    print(c.anexo.value, c.aliquota_efetiva_pct, c.cpp_fora_do_das, c.carga_total)
+```
+
+O Anexo IV parece 2,4 pontos mais barato que o III e é 5,5 pontos mais caro. A inversão é de 7,9 pontos, e some inteira de uma comparação feita por alíquota.
+
+## Quanto dá para recuperar
+
+```python
+from simples_nacional import Anexo, Competencia, indebito_por_segregacao
+
+meses = [
+    Competencia(2026, m, Decimal("900000"),
+                receita_sem_regime_especial=Decimal("20000"),
+                receita_monofasica_e_com_icms_st=Decimal("60000"))
+    for m in range(1, 13)
+]
+
+r = indebito_por_segregacao(meses, Anexo.I)
+r.recuperavel   # Decimal('28929.60')
+r.prescrito     # o que passou dos cinco anos
+r.data_de_corte
+```
+
+Prazo do art. 168 do CTN, cinco anos contados do pagamento indevido. A contagem usa o vencimento do DAS como referência; quem pagou em atraso conta da data efetiva. Pedido administrativo não interrompe o prazo.
+
 ## O degrau do sublimite
 
 Atravessar R$ 3.600.000 **reduz** a alíquota efetiva do DAS. Em todos os cinco anexos:

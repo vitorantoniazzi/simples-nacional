@@ -25,6 +25,16 @@ from .carga import (
     PosicaoNaCadeia,
     carga_fora_do_das,
 )
+from .comparacao import (
+    CPP_ALIQUOTA_PCT,
+    FAP_MAXIMO,
+    FAP_MINIMO,
+    RAT_MAXIMO_PCT,
+    RAT_MINIMO_PCT,
+    CargaDoAnexo,
+    comparar_anexos,
+    cpp_fora_do_das,
+)
 from .core import (
     Apuracao,
     aliquota_efetiva,
@@ -40,6 +50,15 @@ from .reparticao import (
     das_por_tributo,
     reparticao_da_faixa,
 )
+from .segregacao import (
+    ANOS_DE_PRESCRICAO,
+    Competencia,
+    Indebito,
+    IndebitoDaCompetencia,
+    das_com_segregacao,
+    indebito_por_segregacao,
+    percentual_segregavel,
+)
 from .setores import RESSALVAS, Ressalva, ressalvas_de, setores_registrados
 from .tabelas import (
     FATOR_R_MINIMO,
@@ -50,13 +69,19 @@ from .tabelas import (
     Faixa,
 )
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 __all__ = [
+    "ANOS_DE_PRESCRICAO",
     "CPP_ALIQUOTA_FOLHA_PCT",
+    "CPP_ALIQUOTA_PCT",
+    "FAP_MAXIMO",
+    "FAP_MINIMO",
     "FATOR_R_MINIMO",
     "ISS_TETO_EFETIVO_PCT",
     "LIMITE_SIMPLES",
+    "RAT_MAXIMO_PCT",
+    "RAT_MINIMO_PCT",
     "REPARTICAO",
     "RESSALVAS",
     "SUBLIMITE_ICMS_ISS",
@@ -64,8 +89,12 @@ __all__ = [
     "TRIBUTOS_NO_DAS",
     "Anexo",
     "Apuracao",
+    "CargaDoAnexo",
+    "Competencia",
     "Efeito",
     "Faixa",
+    "Indebito",
+    "IndebitoDaCompetencia",
     "ItemForaDoDAS",
     "PosicaoNaCadeia",
     "Ressalva",
@@ -74,9 +103,14 @@ __all__ = [
     "aliquota_efetiva",
     "anexo_por_fator_r",
     "carga_fora_do_das",
+    "comparar_anexos",
+    "cpp_fora_do_das",
+    "das_com_segregacao",
     "das_devido",
     "das_por_tributo",
     "fator_r",
+    "indebito_por_segregacao",
+    "percentual_segregavel",
     "rbt12_proporcional",
     "reparticao_da_faixa",
     "ressalvas_de",
