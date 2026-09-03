@@ -17,6 +17,24 @@ from enum import Enum
 __all__ = ["FATOR_R_MINIMO", "LIMITE_SIMPLES", "SUBLIMITE_ICMS_ISS", "TABELAS", "Anexo", "Faixa"]
 
 
+class Tributo(str, Enum):
+    """Tributos que o Simples Nacional pode unificar no DAS.
+
+    Vive aqui, junto das tabelas, porque tanto a repartição do DAS quanto a
+    lista de tributos abrangidos por anexo se referem a estes mesmos nomes.
+    Mantê-los num só lugar impede que as duas descrições divirjam.
+    """
+
+    IRPJ = "IRPJ"
+    CSLL = "CSLL"
+    COFINS = "COFINS"
+    PIS = "PIS/PASEP"
+    CPP = "CPP"
+    IPI = "IPI"
+    ICMS = "ICMS"
+    ISS = "ISS"
+
+
 class Anexo(Enum):
     """Anexos da LC 123/2006 que definem alíquota nominal e parcela a deduzir."""
 

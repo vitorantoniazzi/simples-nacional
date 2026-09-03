@@ -33,6 +33,13 @@ from .core import (
     fator_r,
     rbt12_proporcional,
 )
+from .reparticao import (
+    ISS_TETO_EFETIVO_PCT,
+    REPARTICAO,
+    Tributo,
+    das_por_tributo,
+    reparticao_da_faixa,
+)
 from .setores import RESSALVAS, Ressalva, ressalvas_de, setores_registrados
 from .tabelas import (
     FATOR_R_MINIMO,
@@ -43,12 +50,14 @@ from .tabelas import (
     Faixa,
 )
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 __all__ = [
     "CPP_ALIQUOTA_FOLHA_PCT",
     "FATOR_R_MINIMO",
+    "ISS_TETO_EFETIVO_PCT",
     "LIMITE_SIMPLES",
+    "REPARTICAO",
     "RESSALVAS",
     "SUBLIMITE_ICMS_ISS",
     "TABELAS",
@@ -60,13 +69,16 @@ __all__ = [
     "ItemForaDoDAS",
     "PosicaoNaCadeia",
     "Ressalva",
+    "Tributo",
     "__version__",
     "aliquota_efetiva",
     "anexo_por_fator_r",
     "carga_fora_do_das",
     "das_devido",
+    "das_por_tributo",
     "fator_r",
     "rbt12_proporcional",
+    "reparticao_da_faixa",
     "ressalvas_de",
     "setores_registrados",
 ]

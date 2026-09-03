@@ -67,6 +67,25 @@ r.fundamentos  # ('LC 123/2006, art. 17, X, "c", ...', 'Resolução CGSN nº 140
 
 Uma microcervejaria no Anexo II com efetiva de 9% não tem carga de 9%: ICMS-ST e IPI são recolhidos fora do DAS. Modelar o negócio pela efetiva subestima o custo.
 
+## Quanto do meu DAS é ICMS?
+
+```python
+from decimal import Decimal
+from simples_nacional import Anexo, Tributo, aliquota_efetiva, das_devido, das_por_tributo
+
+ap = aliquota_efetiva(Decimal("1200000"), Anexo.II)
+das_devido(Decimal("100000"), ap)  # Decimal('9325.00')
+
+partes = das_por_tributo(Decimal("100000"), ap)
+partes[Tributo.ICMS]  # Decimal('2984.00')
+partes[Tributo.CPP]  # Decimal('3496.88')
+partes[Tributo.PIS] + partes[Tributo.COFINS]  # Decimal('1305.50')
+```
+
+Essa última soma é a que sai do DAS quando a receita é monofásica. Sem a repartição, só se pode dizer *que* algo sai; com ela, quanto.
+
+Cada parcela é arredondada a centavos, então a soma pode divergir de `das_devido` em alguns centavos. O total a recolher é o de `das_devido`; as parcelas servem para atribuição e relatório.
+
 ## O degrau do sublimite
 
 Atravessar R$ 3.600.000 **reduz** a alíquota efetiva do DAS. Em todos os cinco anexos:
@@ -92,11 +111,11 @@ from simples_nacional import Anexo, aliquota_efetiva, carga_fora_do_das
 
 rbt12 = Decimal("1000000")
 
-aliquota_efetiva(rbt12, Anexo.III).aliquota_arredondada   # Decimal('12.44')
-aliquota_efetiva(rbt12, Anexo.IV).aliquota_arredondada    # Decimal('10.02')  parece melhor
+aliquota_efetiva(rbt12, Anexo.III).aliquota_arredondada  # Decimal('12.44')
+aliquota_efetiva(rbt12, Anexo.IV).aliquota_arredondada  # Decimal('10.02')  parece melhor
 
-carga_fora_do_das(Anexo.III)   # ()
-carga_fora_do_das(Anexo.IV)    # (ItemForaDoDAS(tributo='CPP', efeito=ACRESCENTA, ...),)
+carga_fora_do_das(Anexo.III)  # ()
+carga_fora_do_das(Anexo.IV)  # (ItemForaDoDAS(tributo='CPP', efeito=ACRESCENTA, ...),)
 ```
 
 O DAS do Anexo IV não abrange a contribuição patronal: são 20% sobre a folha, mais RAT de 1% a 3%, recolhidos à parte. Comparar anexos pela alíquota efetiva subestima a carga de quem tem folha.
@@ -107,13 +126,15 @@ O DAS do Anexo IV não abrange a contribuição patronal: são 20% sobre a folha
 from simples_nacional import PosicaoNaCadeia, carga_fora_do_das
 
 # cervejaria: é ela quem recolhe o concentrado
-carga_fora_do_das(Anexo.II, receita_monofasica=True, receita_com_icms_st=True,
-                  posicao=PosicaoNaCadeia.PRODUTOR)
+carga_fora_do_das(
+    Anexo.II, receita_monofasica=True, receita_com_icms_st=True, posicao=PosicaoNaCadeia.PRODUTOR
+)
 # PIS/COFINS: ACRESCENTA · ICMS-ST: ACRESCENTA
 
 # bar que revende a mesma cerveja: já foi tributada antes
-carga_fora_do_das(Anexo.I, receita_monofasica=True, receita_com_icms_st=True,
-                  posicao=PosicaoNaCadeia.REVENDEDOR)
+carga_fora_do_das(
+    Anexo.I, receita_monofasica=True, receita_com_icms_st=True, posicao=PosicaoNaCadeia.REVENDEDOR
+)
 # PIS/COFINS: REDUZ · ICMS-ST: REDUZ
 ```
 
@@ -141,13 +162,14 @@ Aceite `Decimal`, `int` ou `str`.
 
 ## O que não faz
 
-- **Repartição por tributo.** Os anexos quebram o DAS em IRPJ, CSLL, PIS, COFINS, CPP, ICMS e ISS. Não está aqui ainda, porque são 210 percentuais e publicar tabela fiscal meio conferida é pior que não publicar. Planejado para a 0.2.
 - **Enquadramento de atividade.** Descobrir o anexo de um CNAE é decisão contábil, não aritmética.
 - **Sublimite estadual.** Alguns estados adotam sublimite próprio; aqui só o federal de R$ 3,6 mi.
 
 ## Fonte das tabelas
 
-Anexos I a V da [LC 123/2006](https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp123.htm), na redação da [LC 155/2016](https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp155.htm), vigente desde 01/01/2018. As tabelas estão em `tabelas.py` como transcrição da lei, e `tests/test_tabelas.py` as compara com uma segunda transcrição independente — se divergirem, o teste quebra.
+Anexos I a V da [LC 123/2006](https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp123.htm), na redação da [LC 155/2016](https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp155.htm), vigente desde 01/01/2018.
+
+As tabelas de faixa estão em `tabelas.py` e as de repartição em `reparticao.py`, ambas como transcrição da lei. Os testes as comparam com uma segunda transcrição independente — se divergirem, o teste quebra. A repartição tem ainda uma validação que erro de transcrição quase sempre dispara: os percentuais de cada faixa somam exatamente 100%.
 
 ## Não é assessoria fiscal
 

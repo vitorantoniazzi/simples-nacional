@@ -11,6 +11,7 @@ from simples_nacional import (
     Anexo,
     Efeito,
     PosicaoNaCadeia,
+    Tributo,
     aliquota_efetiva,
     carga_fora_do_das,
 )
@@ -18,14 +19,14 @@ from simples_nacional import (
 
 def test_somente_o_anexo_iv_deixa_a_cpp_fora_do_das() -> None:
     for anexo in Anexo:
-        tem_cpp = "CPP" in TRIBUTOS_NO_DAS[anexo]
+        tem_cpp = Tributo.CPP in TRIBUTOS_NO_DAS[anexo]
         assert tem_cpp is (anexo is not Anexo.IV), anexo
 
 
 def test_anexo_ii_e_o_unico_com_ipi_no_das() -> None:
     # Só a indústria recolhe IPI, e ela o recolhe dentro do DAS.
     for anexo in Anexo:
-        assert ("IPI" in TRIBUTOS_NO_DAS[anexo]) is (anexo is Anexo.II), anexo
+        assert (Tributo.IPI in TRIBUTOS_NO_DAS[anexo]) is (anexo is Anexo.II), anexo
 
 
 @pytest.mark.parametrize("anexo", [Anexo.I, Anexo.II, Anexo.III, Anexo.V])

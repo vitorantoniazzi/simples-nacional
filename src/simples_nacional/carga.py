@@ -24,7 +24,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 
-from .tabelas import Anexo
+from .tabelas import Anexo, Tributo
 
 __all__ = [
     "CPP_ALIQUOTA_FOLHA_PCT",
@@ -55,12 +55,20 @@ class PosicaoNaCadeia(Enum):
 
 # Tributos abrangidos pelo DAS em cada anexo (LC 123/2006, art. 13 e art. 18).
 # O Anexo IV é a exceção que importa: não abrange a CPP.
-TRIBUTOS_NO_DAS: dict[Anexo, tuple[str, ...]] = {
-    Anexo.I: ("IRPJ", "CSLL", "PIS", "COFINS", "CPP", "ICMS"),
-    Anexo.II: ("IRPJ", "CSLL", "PIS", "COFINS", "CPP", "IPI", "ICMS"),
-    Anexo.III: ("IRPJ", "CSLL", "PIS", "COFINS", "CPP", "ISS"),
-    Anexo.IV: ("IRPJ", "CSLL", "PIS", "COFINS", "ISS"),
-    Anexo.V: ("IRPJ", "CSLL", "PIS", "COFINS", "CPP", "ISS"),
+TRIBUTOS_NO_DAS: dict[Anexo, tuple[Tributo, ...]] = {
+    Anexo.I: (Tributo.IRPJ, Tributo.CSLL, Tributo.COFINS, Tributo.PIS, Tributo.CPP, Tributo.ICMS),
+    Anexo.II: (
+        Tributo.IRPJ,
+        Tributo.CSLL,
+        Tributo.COFINS,
+        Tributo.PIS,
+        Tributo.CPP,
+        Tributo.IPI,
+        Tributo.ICMS,
+    ),
+    Anexo.III: (Tributo.IRPJ, Tributo.CSLL, Tributo.COFINS, Tributo.PIS, Tributo.CPP, Tributo.ISS),
+    Anexo.IV: (Tributo.IRPJ, Tributo.CSLL, Tributo.COFINS, Tributo.PIS, Tributo.ISS),
+    Anexo.V: (Tributo.IRPJ, Tributo.CSLL, Tributo.COFINS, Tributo.PIS, Tributo.CPP, Tributo.ISS),
 }
 
 # Alíquota da contribuição patronal sobre a folha, devida à parte no Anexo IV.
@@ -101,7 +109,7 @@ def carga_fora_do_das(
     """
     itens: list[ItemForaDoDAS] = []
 
-    if "CPP" not in TRIBUTOS_NO_DAS[anexo]:
+    if Tributo.CPP not in TRIBUTOS_NO_DAS[anexo]:
         itens.append(
             ItemForaDoDAS(
                 tributo="CPP",
