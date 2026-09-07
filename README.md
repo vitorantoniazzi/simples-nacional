@@ -86,6 +86,23 @@ Essa última soma é a que sai do DAS quando a receita é monofásica. Sem a rep
 
 Cada parcela é arredondada a centavos, então a soma pode divergir de `das_devido` em alguns centavos. O total a recolher é o de `das_devido`; as parcelas servem para atribuição e relatório.
 
+## Simples ou Lucro Presumido?
+
+```python
+from simples_nacional import Anexo, AtividadePresumido, comparar_regimes
+
+c = comparar_regimes(Decimal("240000"), Anexo.III, Decimal("960000"),
+                     AtividadePresumido.SERVICOS, iss_pct=5)
+c.total_simples      # Decimal('29490.00')
+c.total_presumido    # Decimal('40872.00')
+c.regime_mais_barato # 'simples'
+c.comparavel         # True
+```
+
+Sem `iss_pct`, o mesmo caso dá `'presumido'` — porque o ISS de uma prestadora fica de fora e o Lucro Presumido sai subestimado em R$ 12 mil. Por isso `comparavel` existe: ele é `False` quando falta dado para a comparação significar algo, e o valor de `diferenca` não deve ser usado nesse caso.
+
+O módulo recusa modelar a majoração da LC 224/2025 (acima de R$ 5 mi anuais), porque a norma está sob litígio com liminar suspendendo sua aplicação; `acima_do_limite_lc224` sinaliza quando ela se aplicaria. ISS é municipal e não tem tabela nacional, então é parâmetro, não padrão.
+
 ## Carga total, não alíquota
 
 RBT12 de R$ 1 milhão, receita mensal de R$ 80 mil, folha de R$ 30 mil:
@@ -110,15 +127,19 @@ O Anexo IV parece 2,4 pontos mais barato que o III e é 5,5 pontos mais caro. A 
 from simples_nacional import Anexo, Competencia, indebito_por_segregacao
 
 meses = [
-    Competencia(2026, m, Decimal("900000"),
-                receita_sem_regime_especial=Decimal("20000"),
-                receita_monofasica_e_com_icms_st=Decimal("60000"))
+    Competencia(
+        2026,
+        m,
+        Decimal("900000"),
+        receita_sem_regime_especial=Decimal("20000"),
+        receita_monofasica_e_com_icms_st=Decimal("60000"),
+    )
     for m in range(1, 13)
 ]
 
 r = indebito_por_segregacao(meses, Anexo.I)
-r.recuperavel   # Decimal('28929.60')
-r.prescrito     # o que passou dos cinco anos
+r.recuperavel  # Decimal('28929.60')
+r.prescrito  # o que passou dos cinco anos
 r.data_de_corte
 ```
 

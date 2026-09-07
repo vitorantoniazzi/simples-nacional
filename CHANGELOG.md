@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.5.0
+
+**Lucro Presumido, para responder o que vem antes de "qual anexo?".** `lucro_presumido` apura o trimestre pela parte estabelecida da lei — presunção de 8%/12% em comércio e indústria e 32% em serviços (Lei 9.249/1995, arts. 15 e 20), IRPJ de 15% com adicional de 10% sobre o que exceder R$ 60.000 de base no trimestre, CSLL de 9%, PIS de 0,65% e COFINS de 3% cumulativos.
+
+`comparar_regimes` põe Simples e Lucro Presumido no mesmo trimestre. **Leia `comparavel` antes de usar a diferença.** Para uma prestadora do Anexo III com R$ 240 mil no trimestre, o Lucro Presumido sai a R$ 28.872 sem ISS e a R$ 40.872 com ISS de 5% — contra R$ 29.490 do Simples. A resposta inverte, e sem o ISS informado a comparação engana na direção do Presumido.
+
+A contribuição patronal entra sempre no Lucro Presumido, ao contrário do Simples, onde só o Anexo IV a deixa fora do DAS. Ignorá-la faria o Presumido parecer mais barato do que é.
+
+### O que este módulo recusa modelar
+
+- **A majoração da LC 224/2025.** Desde 2026 a receita anual acima de R$ 5 milhões tem a presunção de IRPJ e CSLL acrescida de 10% sobre o excedente. A regra é recente, regulamentada pela IN RFB 2.305/2025 com alterações da IN RFB 2.306/2026, e está sob litígio — há liminar suspendendo sua aplicação. Modelar norma em disputa como assentada produziria número confiante e errado, então `acima_do_limite_lc224` sinaliza quando a receita cruza o limite e a comparação se marca não confiável.
+- **ISS.** É municipal e varia de 2% a 5%; não há tabela nacional. Sem `iss_pct` informado o ISS fica fora e `iss_arbitrado` é `False`.
+- **Transporte de passageiros e revenda de combustíveis.** Têm presunção própria de IRPJ (16% e 1,6%), mas não confirmei a de CSLL em fonte que me satisfizesse. Presunção arbitrada é pior que ausente.
+
 ## 0.4.0
 
 **Carga total, não alíquota.** `comparar_anexos` põe os cinco anexos lado a lado somando o que fica fora do DAS, e `cpp_fora_do_das` quantifica a contribuição patronal do Anexo IV: 20% sobre a folha mais o RAT do grau de risco, ajustado pelo FAP. Para RBT12 de R$ 1 mi, receita de R$ 80 mil e folha de R$ 30 mil, o Anexo IV mostra 10,02% de alíquota contra 12,44% do Anexo III — e carga total de 17,90% contra 12,44%. A comparação por alíquota inverte o resultado.

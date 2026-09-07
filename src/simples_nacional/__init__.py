@@ -32,7 +32,9 @@ from .comparacao import (
     RAT_MAXIMO_PCT,
     RAT_MINIMO_PCT,
     CargaDoAnexo,
+    ComparacaoDeRegimes,
     comparar_anexos,
+    comparar_regimes,
     cpp_fora_do_das,
 )
 from .core import (
@@ -42,6 +44,19 @@ from .core import (
     das_devido,
     fator_r,
     rbt12_proporcional,
+)
+from .presumido import (
+    ADICIONAL_IRPJ_PCT,
+    ALIQUOTA_CSLL_PCT,
+    ALIQUOTA_IRPJ_PCT,
+    COFINS_CUMULATIVO_PCT,
+    LIMITE_ADICIONAL_TRIMESTRAL,
+    LIMITE_MAJORACAO_LC224_ANUAL,
+    PIS_CUMULATIVO_PCT,
+    PRESUNCAO,
+    AtividadePresumido,
+    LucroPresumido,
+    lucro_presumido,
 )
 from .reparticao import (
     ISS_TETO_EFETIVO_PCT,
@@ -69,17 +84,25 @@ from .tabelas import (
     Faixa,
 )
 
-__version__ = "0.4.0"
+__version__ = "0.5.0"
 
 __all__ = [
+    "ADICIONAL_IRPJ_PCT",
+    "ALIQUOTA_CSLL_PCT",
+    "ALIQUOTA_IRPJ_PCT",
     "ANOS_DE_PRESCRICAO",
+    "COFINS_CUMULATIVO_PCT",
     "CPP_ALIQUOTA_FOLHA_PCT",
     "CPP_ALIQUOTA_PCT",
     "FAP_MAXIMO",
     "FAP_MINIMO",
     "FATOR_R_MINIMO",
     "ISS_TETO_EFETIVO_PCT",
+    "LIMITE_ADICIONAL_TRIMESTRAL",
+    "LIMITE_MAJORACAO_LC224_ANUAL",
     "LIMITE_SIMPLES",
+    "PIS_CUMULATIVO_PCT",
+    "PRESUNCAO",
     "RAT_MAXIMO_PCT",
     "RAT_MINIMO_PCT",
     "REPARTICAO",
@@ -89,13 +112,16 @@ __all__ = [
     "TRIBUTOS_NO_DAS",
     "Anexo",
     "Apuracao",
+    "AtividadePresumido",
     "CargaDoAnexo",
+    "ComparacaoDeRegimes",
     "Competencia",
     "Efeito",
     "Faixa",
     "Indebito",
     "IndebitoDaCompetencia",
     "ItemForaDoDAS",
+    "LucroPresumido",
     "PosicaoNaCadeia",
     "Ressalva",
     "Tributo",
@@ -104,12 +130,14 @@ __all__ = [
     "anexo_por_fator_r",
     "carga_fora_do_das",
     "comparar_anexos",
+    "comparar_regimes",
     "cpp_fora_do_das",
     "das_com_segregacao",
     "das_devido",
     "das_por_tributo",
     "fator_r",
     "indebito_por_segregacao",
+    "lucro_presumido",
     "percentual_segregavel",
     "rbt12_proporcional",
     "reparticao_da_faixa",

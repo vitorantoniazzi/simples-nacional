@@ -12,10 +12,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from decimal import ROUND_HALF_UP, Decimal
+from typing import TYPE_CHECKING
 
 from .carga import TRIBUTOS_NO_DAS
 from .core import aliquota_efetiva, das_devido
 from .tabelas import Anexo, Tributo
+
+if TYPE_CHECKING:
+    from .presumido import AtividadePresumido
 
 __all__ = [
     "CPP_ALIQUOTA_PCT",
@@ -24,7 +28,9 @@ __all__ = [
     "RAT_MAXIMO_PCT",
     "RAT_MINIMO_PCT",
     "CargaDoAnexo",
+    "ComparacaoDeRegimes",
     "comparar_anexos",
+    "comparar_regimes",
     "cpp_fora_do_das",
 ]
 
@@ -137,3 +143,100 @@ def comparar_anexos(
             )
         )
     return tuple(saida)
+
+
+@dataclass(frozen=True, slots=True)
+class ComparacaoDeRegimes:
+    """Simples Nacional contra Lucro Presumido, no mesmo trimestre."""
+
+    receita_trimestral: Decimal
+    das_do_trimestre: Decimal
+    cpp_no_simples: Decimal
+    """Zero fora do Anexo IV, onde a patronal está dentro do DAS."""
+    total_simples: Decimal
+    total_presumido: Decimal
+    iss_arbitrado: bool
+    acima_do_limite_lc224: bool
+
+    @property
+    def diferenca(self) -> Decimal:
+        """Positiva quando o Simples sai mais barato."""
+        return self.total_presumido - self.total_simples
+
+    @property
+    def regime_mais_barato(self) -> str:
+        if self.total_simples < self.total_presumido:
+            return "simples"
+        if self.total_presumido < self.total_simples:
+            return "presumido"
+        return "empate"
+
+    @property
+    def comparavel(self) -> bool:
+        """False quando falta dado para que a comparação signifique algo.
+
+        Sem alíquota de ISS, o Lucro Presumido de uma prestadora sai sem ISS e
+        parece mais barato do que é. Acima do limite da LC 224/2025, a
+        majoração não modelada o subestima do mesmo modo.
+        """
+        return self.iss_arbitrado and not self.acima_do_limite_lc224
+
+
+def comparar_regimes(
+    receita_trimestral: Decimal | int | str,
+    anexo: Anexo,
+    rbt12: Decimal | int | str,
+    atividade: AtividadePresumido,
+    *,
+    folha_trimestral: Decimal | int | str = 0,
+    rat_pct: Decimal | int | str = RAT_MINIMO_PCT,
+    fap: Decimal | int | str = Decimal("1"),
+    iss_pct: Decimal | int | str | None = None,
+) -> ComparacaoDeRegimes:
+    """Compara Simples e Lucro Presumido pela carga do trimestre.
+
+    A receita do trimestre é dividida por três para o cálculo mensal do DAS,
+    que é como o Simples apura; o Lucro Presumido apura o trimestre inteiro de
+    uma vez.
+
+    Leia `comparavel` antes de usar a diferença: sem alíquota de ISS informada,
+    ou acima do limite da LC 224/2025, o Lucro Presumido sai subestimado e a
+    comparação engana na direção dele.
+
+    >>> from decimal import Decimal
+    >>> from simples_nacional import Anexo, AtividadePresumido, comparar_regimes
+    >>> c = comparar_regimes(Decimal("240000"), Anexo.III, Decimal("960000"),
+    ...                      AtividadePresumido.SERVICOS, iss_pct=5)
+    >>> c.regime_mais_barato
+    'simples'
+    >>> c.comparavel
+    True
+    """
+    from .presumido import lucro_presumido
+
+    receita = Decimal(str(receita_trimestral))
+    ap = aliquota_efetiva(rbt12, anexo)
+    mensal = receita / 3
+    das = (das_devido(mensal, ap) * 3).quantize(_CENTAVO, rounding=ROUND_HALF_UP)
+    cpp_simples = (
+        cpp_fora_do_das(folha_trimestral, rat_pct=rat_pct, fap=fap)
+        if Tributo.CPP not in TRIBUTOS_NO_DAS[anexo]
+        else Decimal("0.00")
+    )
+    lp = lucro_presumido(
+        receita,
+        atividade,
+        folha_trimestral=folha_trimestral,
+        rat_pct=rat_pct,
+        fap=fap,
+        iss_pct=iss_pct,
+    )
+    return ComparacaoDeRegimes(
+        receita_trimestral=receita,
+        das_do_trimestre=das,
+        cpp_no_simples=cpp_simples,
+        total_simples=das + cpp_simples,
+        total_presumido=lp.total,
+        iss_arbitrado=lp.iss_arbitrado,
+        acima_do_limite_lc224=lp.acima_do_limite_lc224,
+    )
